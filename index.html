@@ -3,54 +3,96 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Explorer Weather — Past & Forecast</title>
+  <title>EasyWeather — Wide Card</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <!-- Chart.js CDN -->
+  <!-- Tailwind (Play CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <main class="container">
-    <header class="header">
-      <h1>EasyWeather</h1>
+<body class="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100 antialiased">
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    <!-- header / search -->
+    <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight">EasyWeather</h1>
+        <p class="text-slate-400 mt-1">Past 7 days + up to 16 days forecast</p>
+      </div>
 
+      <div class="w-full md:w-80">
+        <div class="bg-slate-800/50 backdrop-blur rounded-2xl p-4 shadow-lg">
+          <div class="flex gap-3">
+            <input id="searchInput" class="flex-1 rounded-lg px-4 py-2 bg-slate-900/40 border border-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400" placeholder="Type a city, e.g. 'Mumbai' or 'New York'">
+            <button id="searchBtn" class="rounded-lg px-4 py-2 bg-gradient-to-r from-sky-300 to-sky-500 text-slate-900 font-semibold shadow-sm">Search</button>
+          </div>
 
-
-      
-      <p class="subtitle">Past 7 days + up to 16 days forecast (global, no API key)</p>
+          <ul id="suggestions" class="mt-3 max-h-48 overflow-auto rounded-lg bg-slate-800/60 hidden"></ul>
+          <div id="meta" class="text-slate-400 mt-2 text-sm" aria-live="polite">No data</div>
+        </div>
+      </div>
     </header>
 
-    <section class="search-card">
-      <div class="search-row">
-        <input id="searchInput" placeholder="Type a city, e.g. 'Mumbai' or 'New York'" />
-        <button id="searchBtn">Search</button>
+    <!-- summary -->
+    <section id="summary" class="hidden bg-slate-800/50 backdrop-blur rounded-2xl p-6 shadow-xl">
+      <!-- top: current (WIDE CARD) -->
+      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+        <div class="flex-1 min-w-0">
+          <h2 id="locName" class="text-2xl font-bold">—</h2>
+          <div id="currentSummary" class="text-slate-300 mt-2">—</div>
+        </div>
+
+        <div id="currentDetails" class="w-full md:w-96 flex gap-6 flex-wrap text-center text-slate-300">
+          <!-- JS fills small metric blocks (Feels/Humidity/Wind/Sun) -->
+        </div>
       </div>
-      <ul id="suggestions" class="suggestions" hidden></ul>
-      <div id="meta" class="meta" aria-live="polite"></div>
+
+      <!-- weekly strip (scroll-snap) -->
+      <div id="weeklyStrip" class="mt-6 flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory"></div>
+
+      <!-- hourly mini-strip -->
+      <div id="hourStrip" class="mt-4 flex gap-3 overflow-x-auto pb-3"></div>
+
+      <!-- charts -->
+      <div class="grid md:grid-cols-2 gap-6 mt-6">
+        <div class="bg-slate-900/20 rounded-lg p-3">
+          <canvas id="tempChart" class="rounded-md"></canvas>
+        </div>
+        <div class="bg-slate-900/20 rounded-lg p-3">
+          <canvas id="precipChart" class="rounded-md"></canvas>
+        </div>
+      </div>
+
+      <!-- daily -->
+      <div class="mt-6">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Daily</h3>
+          <button id="toggleMore" class="text-slate-300 text-sm px-3 py-1 rounded-md border border-slate-700">More details ▾</button>
+        </div>
+
+        <div class="mt-3 overflow-x-auto">
+          <table id="dailyTable" class="w-full text-sm table-fixed">
+            <thead class="text-slate-400">
+              <tr><th class="w-40 text-left">Date</th><th class="w-20 text-left">Min °C</th><th class="w-72">Temp span</th><th class="w-20 text-left">Max °C</th><th class="text-left">Weather</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="moreDetails" class="hidden mt-4 bg-slate-900/10 p-4 rounded-lg">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-slate-300"><div class="text-slate-400 text-xs">Pressure</div><div id="pressure">—</div></div>
+            <div class="text-slate-300"><div class="text-slate-400 text-xs">Dew point</div><div id="dewpoint">—</div></div>
+            <div class="text-slate-300"><div class="text-slate-400 text-xs">UV index</div><div id="uv">—</div></div>
+            <div class="text-slate-300"><div class="text-slate-400 text-xs">Visibility</div><div id="visibility">—</div></div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="summary" class="summary hidden">
-      <div class="current">
-        <h2 id="locName"></h2>
-        <div id="currentSummary"></div>
-      </div>
-      <div class="charts">
-        <canvas id="tempChart"></canvas>
-        <canvas id="precipChart"></canvas>
-      </div>
-      <div class="daily">
-        <h3>Daily</h3>
-        <table id="dailyTable">
-          <thead>
-            <tr><th>Date</th><th>Min °C</th><th>Max °C</th><th>Weather</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <small>Data via Open-Meteo (no key required). For details see their docs.</small>
+    <footer class="mt-10 text-center text-slate-400 text-sm">
+      Data via Open-Meteo
     </footer>
   </main>
 
