@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Explorer Weather — Past & Forecast</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>EasyWeather</h1>
+
+
+
+      
+      <p class="subtitle">Past 7 days + up to 16 days forecast (global, no API key)</p>
+    </header>
+
+    <section class="search-card">
+      <div class="search-row">
+        <input id="searchInput" placeholder="Type a city, e.g. 'Mumbai' or 'New York'" />
+        <button id="searchBtn">Search</button>
+      </div>
+      <ul id="suggestions" class="suggestions" hidden></ul>
+      <div id="meta" class="meta" aria-live="polite"></div>
+    </section>
+
+    <section id="summary" class="summary hidden">
+      <div class="current">
+        <h2 id="locName"></h2>
+        <div id="currentSummary"></div>
+      </div>
+      <div class="charts">
+        <canvas id="tempChart"></canvas>
+        <canvas id="precipChart"></canvas>
+      </div>
+      <div class="daily">
+        <h3>Daily</h3>
+        <table id="dailyTable">
+          <thead>
+            <tr><th>Date</th><th>Min °C</th><th>Max °C</th><th>Weather</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <small>Data via Open-Meteo (no key required). For details see their docs.</small>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
