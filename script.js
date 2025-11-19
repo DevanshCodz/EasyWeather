@@ -1,7 +1,3 @@
-// EasyWeather — Final revamp (Wide Card / Apple style)
-// Uses Open-Meteo geocoding + forecast (GET with current_weather=true)
-// Chart.js for charts
-
 const $ = s => document.querySelector(s);
 const searchInput = $('#searchInput');
 const searchBtn = $('#searchBtn');
